@@ -1,7 +1,0 @@
-[build]
-  publish = "."
-  functions = "netlify/functions"
-[[redirects]]
-  from = "/oauth/callback"
-  to = "/.netlify/functions/api?action=callback"
-  status = 200
