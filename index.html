@@ -1,21 +1,90 @@
-<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'><title>POS Messenger</title><style>
-:root{font-family:Inter,system-ui,-apple-system,sans-serif;color:#101828;background:#f4f6f8}*{box-sizing:border-box}body{margin:0;display:flex;justify-content:center}.app{width:100%;max-width:393px;min-height:100dvh;padding:18px 16px 24px;background:#fff}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-weight:800;font-size:20px}.dot{width:10px;height:10px;border-radius:50%;background:#98a2b3}.dot.on{background:#12b76a}.card{border:1px solid #e4e7ec;border-radius:16px;padding:14px;margin-bottom:12px;background:#fff}.label{font-size:12px;font-weight:700;color:#667085;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}button,select,textarea{width:100%;font:inherit;border-radius:12px}button{border:0;padding:14px;font-weight:800;background:#101828;color:#fff}button.secondary{background:#eef2f6;color:#344054}button:disabled{opacity:.45}select{padding:12px;border:1px solid #d0d5dd;background:white}.devices{display:grid;gap:8px}.device{display:flex;gap:10px;align-items:center;padding:11px;border:1px solid #e4e7ec;border-radius:12px}.device input{width:18px;height:18px}.device span{font-size:14px}.muted{font-size:12px;color:#667085;line-height:1.4;margin-top:8px}textarea{min-height:285px;resize:vertical;border:1px solid #d0d5dd;padding:14px;line-height:1.45}.status{font-size:13px;line-height:1.4;padding:10px 12px;border-radius:10px;background:#f2f4f7;margin-top:10px}.hidden{display:none}.count{text-align:right;font-size:11px;color:#98a2b3;margin-top:5px}@media(min-height:852px){textarea{min-height:300px}}</style></head><body><main class='app'>
-<div class='top'><div class='brand'>POS Messenger</div><div id='dot' class='dot'></div></div>
-<section id='initCard' class='card'><div class='label'>Connection</div><button id='init'>Initialize Connection</button><div class='muted'>First use opens Lightspeed authorization. Later visits reuse the secure server-side session and refresh tokens automatically.</div></section>
-<section id='controls' class='hidden'>
-<div class='card'><div class='label'>Business location</div><select id='location'></select></div>
-<div class='card'><div class='label'>POS devices seen in shifts</div><div id='devices' class='devices'></div><div class='muted'>Device IDs come from shift data. The current Lightspeed message endpoint sends to the business location, not an individual device.</div></div>
-<div class='card'><div class='label'>Message</div><textarea id='message' maxlength='2000' placeholder='Type the POS message…'></textarea><div id='count' class='count'>0 / 2000</div><button id='send'>SEND</button><div id='status' class='status hidden'></div></div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>K-Series POS Messenger</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#15171a;background:#eef1f4}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;justify-content:center;background:#eef1f4}.phone{width:min(100%,393px);min-height:100vh;background:#fff;padding:22px 18px 28px}.brand{font-size:12px;font-weight:800;letter-spacing:.14em;color:#667085}.title{font-size:28px;font-weight:800;margin:7px 0 4px}.sub{font-size:13px;color:#667085;margin:0 0 22px}.card{border:1px solid #e4e7ec;border-radius:16px;padding:16px;margin:12px 0;background:#fff;box-shadow:0 3px 14px rgba(16,24,40,.05)}label{display:block;font-size:12px;font-weight:700;margin:10px 0 6px;color:#344054}input,select,textarea,button{width:100%;font:inherit}input,select,textarea{border:1px solid #d0d5dd;border-radius:11px;padding:12px;background:#fff;color:#101828}textarea{height:300px;min-height:285px;resize:vertical}button{border:0;border-radius:11px;padding:13px 14px;font-weight:800;cursor:pointer;background:#111827;color:white;margin-top:10px}button.secondary{background:#eef2f6;color:#111827}button.danger{background:#fff1f1;color:#b42318;border:1px solid #fecdca}.status{font-size:12px;padding:10px 12px;border-radius:10px;background:#f2f4f7;color:#475467;margin-top:10px;white-space:pre-wrap;overflow-wrap:anywhere}.ok{background:#ecfdf3;color:#027a48}.err{background:#fef3f2;color:#b42318}.hidden{display:none!important}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meta{font-size:11px;color:#667085;margin-top:8px}.pill{display:inline-block;font-size:11px;font-weight:700;padding:5px 8px;border-radius:999px;background:#f2f4f7;margin:4px 4px 0 0}.send{font-size:16px;padding:15px;background:#0b5fff}.footer{font-size:10px;color:#98a2b3;text-align:center;margin-top:18px}.login-wrap{padding-top:120px}.debug{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;max-height:150px;overflow:auto}
+</style>
+</head>
+<body><main class="phone">
+<section id="loginView" class="login-wrap">
+  <div class="brand">K-SERIES</div><div class="title">POS Messenger</div><p class="sub">Private test interface</p>
+  <div class="card">
+    <label>User</label><input id="username" autocomplete="username" value="">
+    <label>Password</label><input id="password" type="password" autocomplete="current-password" value="">
+    <button id="loginBtn">LOGIN</button><div id="loginStatus" class="status hidden"></div>
+  </div>
+</section>
+
+<section id="appView" class="hidden">
+  <div class="brand">K-SERIES</div><div class="title">POS Messenger</div><p class="sub">GitHub Pages proof of concept</p>
+  <div class="card">
+    <strong>Connection</strong>
+    <div id="connectionStatus" class="status">Not initialized</div>
+    <button id="initBtn">INITIALIZE CONNECTION</button>
+    <button id="disconnectBtn" class="secondary hidden">CLEAR LIGHTSPEED SESSION</button>
+  </div>
+  <div id="messenger" class="hidden">
+    <div class="card">
+      <label>Business location</label><select id="locationSelect"></select>
+      <div class="row"><div><label>Known device</label><select id="deviceSelect"><option>Loading…</option></select></div><div><label>POS user</label><select id="userSelect"><option>Loading…</option></select></div></div>
+      <div class="meta">Device and user lists are informational. The documented Print Message endpoint sends to the selected business location.</div>
+    </div>
+    <div class="card">
+      <label>Message</label><textarea id="message" maxlength="2000" placeholder="Type the message to display on the POS…"></textarea>
+      <button id="sendBtn" class="send">SEND</button>
+      <div id="sendStatus" class="status hidden"></div>
+    </div>
+  </div>
+  <div class="card">
+    <strong>Configuration</strong>
+    <div class="meta">This proof of concept intentionally stores OAuth credentials/tokens in browser-accessible code/storage.</div>
+    <label>Client secret</label><input id="clientSecret" type="password" placeholder="Paste test client secret once">
+    <button id="saveSecretBtn" class="secondary">SAVE TEST SECRET LOCALLY</button>
+    <details><summary class="meta">Diagnostics</summary><div id="debug" class="status debug"></div></details>
+  </div>
+  <button id="logoutBtn" class="danger">LOG OUT OF APP</button>
+  <div class="footer">Designed for 393 × 852 phone screens</div>
 </section>
 <script>
-const $=s=>document.querySelector(s); const API='/.netlify/functions/api';
-function status(t,ok=true){const e=$('#status');e.textContent=t;e.classList.remove('hidden');e.style.background=ok?'#ecfdf3':'#fef3f2'}
-async function json(url,opt){const r=await fetch(url,opt);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||`HTTP ${r.status}`);return d}
-async function boot(){try{const s=await json(API+'?action=session');if(s.connected){$('#dot').classList.add('on');$('#initCard').classList.add('hidden');$('#controls').classList.remove('hidden');await loadBusinesses()}}catch(e){}}
-$('#init').onclick=()=>location.href=API+'?action=login';
-async function loadBusinesses(){try{const data=await json(API+'?action=businesses');const loc=$('#location');loc.innerHTML='';data.forEach(b=>(b.businessLocations||[]).forEach(l=>{const o=document.createElement('option');o.value=l.id;o.textContent=`${b.name} — ${l.name}`;loc.appendChild(o)}));if(loc.value)await loadDevices();loc.onchange=loadDevices}catch(e){status(e.message,false)}}
-async function loadDevices(){const box=$('#devices');box.innerHTML='<div class="muted">Loading recent devices…</div>';try{const d=await json(API+'?action=devices&businessLocationId='+encodeURIComponent($('#location').value));box.innerHTML='';if(!d.length){box.innerHTML='<div class="muted">No devices found in recent shift records.</div>';return}d.forEach(x=>{const l=document.createElement('label');l.className='device';l.innerHTML=`<input type="checkbox" value="${x.deviceId}" checked><span>POS ${x.deviceId}<br><small>Staff ${x.staffId??'—'} · ${x.lastSeen??''}</small></span>`;box.appendChild(l)})}catch(e){box.innerHTML='<div class="muted">'+e.message+'</div>'}}
-$('#message').oninput=e=>$('#count').textContent=`${e.target.value.length} / 2000`;
-$('#send').onclick=async()=>{const msg=$('#message').value.trim();if(!msg)return status('Enter a message first.',false);$('#send').disabled=true;try{const d=await json(API+'?action=send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({businessLocationId:$('#location').value,message:msg})});status(d.status==='ok'?'Message accepted by Lightspeed.':'Lightspeed response: '+d.status,true)}catch(e){status(e.message,false)}finally{$('#send').disabled=false}};
-const p=new URLSearchParams(location.search);if(p.get('connected'))history.replaceState({},'',location.pathname);boot();
+const CONFIG={
+  clientId:'devp-prod-lightspeed-cc7392163da2e2aea797228591a7e0de',
+  // Exact GitHub Pages callback registered with the Lightspeed OAuth client.
+  redirectUri: 'https://damiancarroll-ai.github.io/POST-NOTE/',
+  authUrl:'https://auth.lsk-prod.app/realms/k-series/protocol/openid-connect/auth',
+  tokenUrl:'https://auth.lsk-prod.app/realms/k-series/protocol/openid-connect/token',
+  apiBase:'https://api.lsk.lightspeed.app',
+  scopes:'orders-api staff-api financial-api offline_access'
+};
+const APP_USER='superuser001', APP_PASS='superuser001password!';
+const $=id=>document.getElementById(id); const log=(...x)=>{$('debug').textContent=new Date().toLocaleTimeString()+' '+x.map(v=>typeof v==='string'?v:JSON.stringify(v)).join(' ')+'\n'+$('debug').textContent};
+function setStatus(el,msg,type=''){el.textContent=msg;el.className='status '+type;el.classList.remove('hidden')}
+function showApp(){ $('loginView').classList.add('hidden');$('appView').classList.remove('hidden'); }
+function login(){if($('username').value===APP_USER&&$('password').value===APP_PASS){sessionStorage.setItem('app_login','1');showApp();boot()}else setStatus($('loginStatus'),'Incorrect username or password.','err')}
+$('loginBtn').onclick=login;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+$('logoutBtn').onclick=()=>{sessionStorage.removeItem('app_login');location.reload()};
+$('saveSecretBtn').onclick=()=>{if(!$('clientSecret').value)return;localStorage.setItem('ls_client_secret',$('clientSecret').value);$('clientSecret').value='';setStatus($('connectionStatus'),'Test client secret saved locally. Ready to initialize.','ok')};
+function getSecret(){return localStorage.getItem('ls_client_secret')||''}
+function saveTokens(t){localStorage.setItem('ls_access_token',t.access_token);localStorage.setItem('ls_refresh_token',t.refresh_token);localStorage.setItem('ls_access_expiry',String(Date.now()+(Number(t.expires_in||1500)*1000))); if(t.refresh_expires_in!==undefined)localStorage.setItem('ls_refresh_expires_in',String(t.refresh_expires_in));}
+function clearTokens(){['ls_access_token','ls_refresh_token','ls_access_expiry','ls_refresh_expires_in'].forEach(k=>localStorage.removeItem(k));}
+function basicAuth(){const secret=getSecret();if(!secret)throw new Error('Enter and save your test client secret first.');return 'Basic '+btoa(unescape(encodeURIComponent(CONFIG.clientId+':'+secret)))}
+async function tokenRequest(params){const r=await fetch(CONFIG.tokenUrl,{method:'POST',headers:{Authorization:basicAuth(),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(params)});const text=await r.text();let data;try{data=JSON.parse(text)}catch{data={raw:text}}if(!r.ok)throw new Error('Token request '+r.status+': '+JSON.stringify(data));saveTokens(data);return data}
+async function exchangeCode(code){return tokenRequest({grant_type:'authorization_code',code,redirect_uri:CONFIG.redirectUri})}
+async function refresh(){const rt=localStorage.getItem('ls_refresh_token');if(!rt)throw new Error('No refresh token. Initialize again.');log('Refreshing access token');return tokenRequest({grant_type:'refresh_token',refresh_token:rt})}
+async function accessToken(){let token=localStorage.getItem('ls_access_token');const expiry=Number(localStorage.getItem('ls_access_expiry')||0);if(!token||Date.now()>expiry-60000){await refresh();token=localStorage.getItem('ls_access_token')}return token}
+async function api(path,opts={}){let token=await accessToken();let r=await fetch(CONFIG.apiBase+path,{...opts,headers:{...(opts.headers||{}),Authorization:'Bearer '+token}});if(r.status===401){await refresh();token=localStorage.getItem('ls_access_token');r=await fetch(CONFIG.apiBase+path,{...opts,headers:{...(opts.headers||{}),Authorization:'Bearer '+token}})}const text=await r.text();let data;try{data=text?JSON.parse(text):{}}catch{data={raw:text}}if(!r.ok)throw new Error('API '+r.status+': '+JSON.stringify(data));return data}
+function initialize(){if(!getSecret()){setStatus($('connectionStatus'),'Save your test client secret below first.','err');return}const state=crypto.randomUUID();sessionStorage.setItem('oauth_state',state);const q=new URLSearchParams({response_type:'code',client_id:CONFIG.clientId,redirect_uri:CONFIG.redirectUri,scope:CONFIG.scopes,state});location.href=CONFIG.authUrl+'?'+q.toString()}
+$('initBtn').onclick=initialize;
+$('disconnectBtn').onclick=()=>{clearTokens();localStorage.removeItem('ls_locations');location.href=CONFIG.redirectUri};
+async function handleCallback(){const q=new URLSearchParams(location.search);const err=q.get('error');if(err)throw new Error('OAuth: '+err+' '+(q.get('error_description')||''));const code=q.get('code');if(!code)return false;const expected=sessionStorage.getItem('oauth_state'),got=q.get('state');if(expected&&got&&expected!==got)throw new Error('OAuth state mismatch.');setStatus($('connectionStatus'),'Completing Lightspeed authorization…');await exchangeCode(code);history.replaceState({},'',CONFIG.redirectUri);return true}
+async function discoverBusinesses(){const d=await api('/f/data/businesses');const businesses=d?._embedded?.businessList||[];const locs=[];for(const b of businesses)for(const l of (b.businessLocations||[]))locs.push({businessName:b.businessName,businessId:b.businessId,name:l.blName,id:l.blID});if(!locs.length)throw new Error('No business locations returned.');localStorage.setItem('ls_locations',JSON.stringify(locs));renderLocations(locs);return locs}
+function renderLocations(locs){$('locationSelect').innerHTML=locs.map(l=>`<option value="${l.id}">${esc(l.businessName)} — ${esc(l.name)} (${l.id})</option>`).join('');$('locationSelect').onchange=()=>loadTargets($('locationSelect').value)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function loadTargets(locationId){$('deviceSelect').innerHTML='<option>Loading…</option>';$('userSelect').innerHTML='<option>Loading…</option>';const end=new Date(),start=new Date(Date.now()-30*24*3600*1000);const fmt=d=>d.toISOString().slice(0,19);try{const s=await api(`/staff/v1/businessLocations/${encodeURIComponent(locationId)}/shift?size=100&startTime=${encodeURIComponent(fmt(start))}&endTime=${encodeURIComponent(fmt(end))}`);const shifts=s?.data?.shifts||[];const ids=[...new Set(shifts.map(x=>x.deviceId).filter(Boolean))];$('deviceSelect').innerHTML=ids.length?ids.map(x=>`<option value="${x}">Device ${x}</option>`).join(''):'<option>No recent devices found</option>'}catch(e){$('deviceSelect').innerHTML='<option>Device lookup failed</option>';log(e.message)}try{const u=await api(`/staff/v1/businessLocations/${encodeURIComponent(locationId)}/userTypes/POS?size=100&isActive=true`);const users=u?.data?.staff||[];$('userSelect').innerHTML=users.length?users.map(x=>`<option value="${x.staffId}">${esc((x.firstName+' '+x.lastName).trim()||x.username||x.staffId)}</option>`).join(''):'<option>No active POS users found</option>'}catch(e){$('userSelect').innerHTML='<option>User lookup failed</option>';log(e.message)}}
+async function connected(){setStatus($('connectionStatus'),'Connected to Lightspeed. Tokens will refresh automatically in this browser.','ok');$('initBtn').classList.add('hidden');$('disconnectBtn').classList.remove('hidden');$('messenger').classList.remove('hidden');let locs;try{locs=await discoverBusinesses()}catch(e){const cached=JSON.parse(localStorage.getItem('ls_locations')||'[]');if(cached.length){locs=cached;renderLocations(locs);log('Business discovery failed; using cache',e.message)}else throw e}await loadTargets($('locationSelect').value)}
+$('sendBtn').onclick=async()=>{const message=$('message').value.trim(),id=$('locationSelect').value;if(!message)return setStatus($('sendStatus'),'Enter a message first.','err');$('sendBtn').disabled=true;setStatus($('sendStatus'),'Sending…');try{const d=await api(`/o/op/1/printMsg?businessLocationId=${encodeURIComponent(id)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,alsoToPrinter:false})});setStatus($('sendStatus'),'Message accepted by Lightspeed'+(d.status?' — '+d.status:''),'ok');$('message').value=''}catch(e){setStatus($('sendStatus'),e.message,'err');log(e.message)}finally{$('sendBtn').disabled=false}};
+async function boot(){try{const callback=await handleCallback();if(callback||localStorage.getItem('ls_refresh_token')||localStorage.getItem('ls_access_token'))await connected();else setStatus($('connectionStatus'),'Not initialized. Save the test secret, then initialize once.')}catch(e){setStatus($('connectionStatus'),e.message,'err');log(e.stack||e.message)}}
+if(sessionStorage.getItem('app_login')==='1'){showApp();boot()}else if(new URLSearchParams(location.search).has('code')){sessionStorage.setItem('app_login','1');showApp();boot()}
 </script></main></body></html>
